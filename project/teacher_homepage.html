@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Homepage</title>
+    <script src="/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    
+    <style>
+        :root {
+            --bg-color: #c5cad4c4;
+            --sidebar-bg: #1e1e2f;
+            --sidebar-hover: #2a2a40;
+            --sidebar-active: #2563eb;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e2e8f0;
+            --primary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            color: var(--text-main);
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--sidebar-bg);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            transition: left 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #333;
+        }
+
+        .sidebar-logo {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            padding: 15px 0;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+
+        .nav-item:hover { background-color: var(--sidebar-hover); color: white; }
+        .nav-item.active { background-color: var(--sidebar-active); color: white; border-left: 4px solid white; }
+        .logout { margin-top: auto; border-top: 1px solid #333; }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 30px;
+            gap: 24px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 { font-size: 22px; color: var(--text-main); }
+
+        .user-profile { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            font-size: 20px;
+            font-weight: bolder; 
+            color: black;
+        }
+
+        .menu-icon {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 15px;
+            color: var(--text-main);
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+        .menu-icon:hover { background-color: rgba(0, 0, 0, 0.05); }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background-color: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(2px);
+            z-index: 20;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            width: 100%;
+        }
+
+        @media (min-width: 900px) {
+            .dashboard-container { 
+                grid-template-columns: 350px 1fr;
+            }
+        }
+
+        .details-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .details-card h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .profile-avatar {
+            width: 90px; height: 90px;
+            background-color: #f8fafc;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #94a3b8;
+            border: 2px solid #e2e8f0; 
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar svg { width: 45px; height: 45px; }
+        
+        .attendance-container { width: 100%; margin-bottom: 20px; }
+
+        .attendance-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 10px;
+            background-color: #f8fafc; 
+            border: 1px solid var(--border-color); 
+            color: #475569;
+        }
+
+        .attendance-box.normal { background-color: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+        .attendance-box.warning { background-color: #fef2f2; border-color: #fecaca; color: #991b1b; }
+
+        .btn-qr-commit {
+            width: 100%; height: 52px;
+            border-radius: 10px;
+            font-size: 14px; font-weight: 700;
+            cursor: pointer; border: none;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white; text-transform: uppercase;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+            transition: all 0.2s ease;
+            margin-top: auto;
+        }
+        .btn-qr-commit:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(34, 197, 94, 0.35); }
+
+        .kpi-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 20px;
+            width: 100%;
+        }
+
+        .kpi-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .card-icon {
+            width: 45px; height: 45px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .card-info h3 { font-size: 22px; margin: 0; color: var(--text-main); }
+        .card-info p { font-size: 16px; font-weight: bold; color: var(--text-muted); margin: 0 0 4px 0; }
+
+        .bg-blue { background-color: var(--primary); }
+        .bg-green { background-color: var(--success); }
+        .bg-purple { background-color: #8b5cf6; }
+        .bg-red { background-color: var(--danger); }
+
+        .chart-card {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-header h3 { 
+            font-size: 18px; 
+            color: #0f172a; 
+            font-weight: 700;
+        }
+
+        .chart-dropdown {
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: #f8fafc;
+            color: var(--text-main);
+            outline: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: border-color 0.2s;
+        }
+        .chart-dropdown:hover { border-color: var(--primary); }
+
+        .chart-layout-wrapper {
+            display: flex;
+            width: 100%;
+            height: 280px;
+            position: relative;
+        }
+        
+        .fixed-y-axis {
+            width: 90px;
+            height: 100%;
+            background-color: #ffffff;
+            z-index: 10;
+            position: relative;
+            box-shadow: 4px 0 8px -4px rgba(0,0,0,0.05); 
+        }
+        .scroll-container {
+            flex-grow: 1;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch; 
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+        .scroll-container::-webkit-scrollbar { height: 6px; }
+        .scroll-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .scroll-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .scroll-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .scroll-inner-canvas {
+            height: 100%;
+            min-width: 100%; 
+            padding-right: 20px;
+            transition: min-width 0.3s ease;
+        }
+
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            width: 100%;
+        }
+
+        .log-header {
+            padding: 20px; 
+            border-bottom: 1px solid var(--border-color); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -250px;
+                width: 250px;
+                height: 100vh;
+                z-index: 30;
+                box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+            }
+            body.sidebar-open .sidebar { 
+                left: 0;
+            }
+            body.sidebar-open .sidebar-overlay { 
+                display: block;
+            }
+            .menu-icon {
+                display: block;
+            }
+            .main-content {
+                padding: 20px;
+            }
+            .logout { 
+                margin-top: auto; 
+                margin-bottom: 100px;
+                border-top: 1px solid #333; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <img src="LogoNSPU.png" class="sidebar-logo" alt="NSPU Logo" onerror="this.style.display='none'">NSPU
+        </div>
+        <nav class="nav-menu">
+            <a href="homepage" class="nav-item active"><span class="material-symbols-outlined">grid_view</span> Dashboard</a>
+            <a href="attendance?subject=MYANMAR" class="nav-item"><span class="material-symbols-outlined">how_to_reg</span> Attendance List</a>
+            <a href="timetable" class="nav-item"><span class="material-symbols-outlined">calendar_today</span> Timetable</a>
+            <a href="profile" class="nav-item"><span class="material-symbols-outlined">person</span> User Profile</a>
+            <a href="logout" class="nav-item logout"><span class="material-symbols-outlined">logout</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <div style="display: flex; align-items: center;">
+                <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+                <h1>Digital Classroom Attendance</h1>
+            </div>
+            <div class="user-profile">
+                <div id="currentDate">Loading date...</div>
+            </div>
+        </header>
+
+        <div class="dashboard-container">
+            <div class="card details-card">
+                <h2>Welcome 1st Year students</h2>
+                <div class="profile-avatar">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                </div>
+                
+                <div class="attendance-container">
+                    <div class="attendance-box {{ box_class }}">
+                        <span>Live Attendance Rate</span>
+                        <span id="liveAttendanceRate">{{ attendance_rate }}%</span>
+                    </div>
+                </div>
+                
+                <form action="/commit_qr_attendance" method="POST" style="width: 100%;">
+                    <button type="submit" class="btn-qr-commit">Update Attendance</button>
+                </form>
+            </div>
+
+            <section class="kpi-container">
+                <div class="card kpi-card">
+                    <div class="card-icon bg-blue"><span class="material-symbols-outlined">group</span></div>
+                    <div class="card-info">
+                        <p>Total Students</p>
+                        <h3 id="kpi-total">45</h3>
+                    </div>
+                </div>
+                <div class="card kpi-card">
+                    <div class="card-icon bg-green"><span class="material-symbols-outlined">event_available</span></div>
+                    <div class="card-info">
+                        <p>Today's attendance</p>
+                        <h3 id="kpi-rate">{{ today_attendance }}%</h3>
+                    </div>
+                </div>
+                <div class="card kpi-card">
+                    <div class="card-icon bg-purple"><span class="material-symbols-outlined">check_circle</span></div>
+                    <div class="card-info">
+                        <p>Present</p>
+                        <h3 id="kpi-present">{{ present_count }}</h3>
+                    </div>
+                </div>
+                <div class="card kpi-card">
+                    <div class="card-icon bg-red"><span class="material-symbols-outlined">pending_actions</span></div>
+                    <div class="card-info">
+                        <p>Absent</p>
+                        <h3 id="kpi-absent">{{ absent_count }}</h3>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="card chart-card">
+            <div class="chart-header">
+                <h3>Attendance Progress History</h3>
+                <select id="timeframeSelect" class="chart-dropdown">
+                    <option value="recent">Recent</option>
+                    <option value="month">Last 30 data</option>
+                    <option value="all">All</option>
+                </select>
+            </div>
+            
+            <div class="chart-layout-wrapper">
+                <div class="fixed-y-axis">
+                    <canvas id="yAxisChart"></canvas>
+                </div>
+                
+                <div class="scroll-container" id="scrollContainer">
+                    <div class="scroll-inner-canvas" id="scrollInnerCanvas">
+                        <canvas id="mainBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function fetchLiveRate() {  
+        try {
+            const response = await fetch('/api/kpis');
+            const data = await response.json();
+            
+            if (data.attendance_rate !== undefined) {
+                const rateElement = document.getElementById('liveAttendanceRate');
+                rateElement.textContent = data.attendance_rate + '%';
+                
+                const boxContainer = rateElement.parentElement;
+                if (data.attendance_rate >= 75) {
+                    boxContainer.className = "attendance-box normal";
+                } else {
+                    boxContainer.className = "attendance-box warning";
+                }
+            }
+
+            if (data.total_students !== undefined) {
+                document.getElementById('kpi-total').textContent = data.total_students;
+            }
+            if (data.today_attendance !== undefined) {
+                document.getElementById('kpi-rate').textContent = data.today_attendance + '%';
+            }
+            if (data.present_count !== undefined) {
+                document.getElementById('kpi-present').textContent = data.present_count;
+            }
+            if (data.absent_count !== undefined) {
+                document.getElementById('kpi-absent').textContent = data.absent_count;
+            }
+
+            } catch (error) {
+                console.error('Error updating live attendance rate:', error);
+            }
+        }
+
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            displayCurrentDate();
+            loadKpiData(); 
+            initCombinedChart();
+            setInterval(fetchLiveRate, 2000);
+        });
+        let mainChart, yAxisChart;
+        let masterDates = [];
+        let masterRates = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            displayCurrentDate();
+            loadKpiData(); 
+            initCombinedChart();
+        });
+
+        function toggleSidebar() {
+            document.body.classList.toggle('sidebar-open');
+        }
+
+        function displayCurrentDate() {
+            const dateElement = document.getElementById('currentDate');
+            if (dateElement) {
+                const today = new Date();
+                const options = { month: 'long', day: 'numeric', year: 'numeric' };
+                dateElement.textContent = today.toLocaleDateString('en-US', options);
+            }
+        }
+
+        async function loadKpiData() {  
+            try {
+                const response = await fetch('/api/kpis');
+                const data = await response.json();
+                document.getElementById('kpi-total').textContent = data.total_students || '--';
+            } catch (error) {
+                console.error('Error fetching KPI data:', error);
+            }
+        }
+
+        function initCombinedChart() {
+            const mainCanvas = document.getElementById('mainBarChart');
+            const yAxisCanvas = document.getElementById('yAxisChart');
+            if (!mainCanvas || !yAxisCanvas) return;
+
+            const ctxMain = mainCanvas.getContext('2d');
+            const ctxYAxis = yAxisCanvas.getContext('2d');
+            
+            const barGradient = ctxMain.createLinearGradient(0, 0, 0, 300);
+            barGradient.addColorStop(0, '#f97316'); 
+            barGradient.addColorStop(1, '#ea580c'); 
+
+            try {
+                masterDates = JSON.parse('{{ chart_labels }}'); 
+                masterRates = JSON.parse('{{ chart_data }}'); 
+            } catch (e) {
+                console.warn("Python template variables missing, using fallback data.");
+                masterDates = ['07/01/26', '07/03/26', '07/07/26', '07/12/26', '07/15/26', '07/22/26', '08/01/26', '08/04/26', '08/10/26'];
+                masterRates = [68, 100, 82, 64, 78, 91, 85, 96, 100];
+            }
+            const commonYScale = {
+                stacked: true, min: 0, max: 100,
+                grid: { color: '#e2e8f0', drawBorder: false, tickLength: 0, borderDash: [5, 5] },
+                border: { display: false }
+            };
+
+            const commonXScale = {
+                stacked: true,
+                grid: { display: false },
+                border: { display: false }
+            };
+
+            mainChart = new Chart(ctxMain, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Attendance Rate',
+                            data: [],
+                            backgroundColor: '#2563eb',
+                            borderRadius: 5, barPercentage: 0.5, maxBarThickness: 50 
+                        },
+                        {
+                            label: 'Target Limit',
+                            data: [],
+                            backgroundColor: '#fff7ed', borderColor: '#ffedd5',
+                            borderWidth: 1, borderRadius: 5, barPercentage: 0.5, maxBarThickness: 50
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    animation: { duration: 800, easing: 'easeOutQuart' },
+                    layout: { padding: { left: 0 } }, 
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            titleFont: { size: 12 }, bodyFont: { size: 13, weight: 'bold' },
+                            padding: 10, cornerRadius: 6, displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.datasetIndex === 1) return null; 
+                                    return `Attendance: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { ...commonXScale, ticks: { color: '#64748b', font: { size: 11 }, padding: 8 } },
+                        y: { 
+                            ...commonYScale, 
+                            ticks: { 
+                                display: false,
+                                stepSize: 25 
+                            } 
+                        }
+                    }
+                }
+            });
+
+            yAxisChart = new Chart(ctxYAxis, {
+                type: 'bar',
+                data: { labels: [], datasets: [{ data: [] }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false, animation: false,
+                    layout: { 
+                        padding: { left: 10, right: 4, top: 0, bottom: 0 } 
+                    },
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    scales: {
+                        x: { ...commonXScale, ticks: { color: 'transparent', font: { size: 11 }, padding: 0 } },
+                        y: {
+                            ...commonYScale, grid: { display: false }, 
+                            ticks: {
+                                color: '#64748b', font: { size: 11 }, 
+                                padding: 0, 
+                                stepSize: 25, callback: value => value + '%'
+                            }
+                        }
+                    }
+                }
+            });
+
+            const scrollContainer = document.getElementById('scrollContainer');
+            scrollContainer.addEventListener('wheel', function(e) {
+                if (e.deltaY !== 0) {
+                    e.preventDefault();
+                    this.scrollLeft += e.deltaY;
+                }
+            }, { passive: false });
+
+            filterChartData('recent');
+
+            document.getElementById('timeframeSelect').addEventListener('change', (e) => {
+                filterChartData(e.target.value);
+            });
+        }
+
+        function filterChartData(timeframe) {
+            if (!mainChart) return;
+
+            let filteredDates = [];
+            let filteredRates = [];
+
+            if (timeframe === 'recent') {
+                filteredDates = masterDates.slice(-7);
+                filteredRates = masterRates.slice(-7);
+            } else if (timeframe === 'month') {
+                filteredDates = masterDates.slice(-30);
+                filteredRates = masterRates.slice(-30);
+            } else {
+                filteredDates = masterDates.slice();
+                filteredRates = masterRates.slice();
+            }
+
+            filteredDates.reverse();
+            filteredRates.reverse();
+
+            const targetRemainder = filteredRates.map(rate => 100 - rate);
+
+            const scrollInner = document.getElementById('scrollInnerCanvas');
+            const requiredWidth = Math.max(100, filteredDates.length * 55); 
+            scrollInner.style.minWidth = requiredWidth + 'px';
+
+            mainChart.data.labels = filteredDates;
+            mainChart.data.datasets[0].data = filteredRates;
+            
+            mainChart.data.datasets[0].backgroundColor = filteredRates.map(rate => rate < 60 ? '#f97316' : '#2563eb');
+
+            mainChart.data.datasets[1].data = targetRemainder;
+            mainChart.update();
+
+            yAxisChart.data.labels = filteredDates; 
+            yAxisChart.update();
+        }
+    </script>
+</body>
+</html>

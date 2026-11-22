@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Teacher Profile</title>
+    <style>
+        :root {
+            --bg-gradient: #414141;
+            --card-bg: #ffffff;
+            --surface: #ffffff;
+            --accent-gradient: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --field-bg: #f8fafc;
+            --field-border: #e2e8f0;
+            --badge-bg: #eff6ff;
+            --badge-text: #2563eb;
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 430px;
+            background-color: var(--card-bg);
+            border-radius: 32px;
+            padding: 30px 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .back-btn, .edit-toggle-btn {
+            text-decoration: none;
+            background: var(--surface);
+            padding: 8px 14px;
+            border-radius: 10px;
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 13px;
+            border: 1px solid var(--field-border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover, .edit-toggle-btn:hover {
+            background-color: var(--field-bg);
+            border-color: #cbd5e1;
+        }
+
+        .profile-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .profile {
+            width: 105px; 
+            height: 105px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+            padding: 4px;
+            position: relative;
+        }
+
+        .profile::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            pointer-events: none;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+            margin-left: 4px;
+            color: var(--text-muted);
+        }
+
+        .info-field {
+            width: 100%;
+            border: 1px solid var(--field-border);
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            font-size: 15px;
+            font-weight: 500;
+            outline: none;
+            background-color: var(--field-bg);
+            color: var(--text-main);
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.01);
+            transition: border 0.2s ease;
+        }
+
+        input.info-field:focus {
+            border-color: #2563eb;
+            background-color: #ffffff;
+        }
+
+        h3 {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            margin: 28px 0 14px 4px;
+        }
+
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+        .class-badge {
+            border: 1px solid transparent;
+            border-radius: 14px;
+            padding: 14px 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+            background-color: var(--badge-bg);
+            color: var(--badge-text);
+            transition: all 0.2s ease;
+        }
+
+        .class-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+            background-color: #dbeafe;
+        }
+        .action-btn {
+            display: block;
+            width: 100%;
+            text-decoration: none;
+            text-align: center;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .cancel-btn {
+            width: 100%;
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--field-border);
+            padding: 12px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-container">
+        <div class="header">
+            <a href="homepage" class="back-btn">← Back</a>
+            <button type="button" id="editToggleBtn" class="edit-toggle-btn" onclick="toggleEditMode()">Edit Profile</button>
+        </div>
+
+        <div class="profile-area">
+            <div class="profile" onclick="document.getElementById('profileInput').click()" style="cursor: pointer; overflow: hidden; position: relative;">
+                <img id="avatarImage" src="/project/profile/user_{{ unique_id }}.jpg" 
+                     onerror="this.style.display='none'; document.getElementById('defaultSvg').style.display='block';" 
+                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                
+                <svg id="defaultSvg" fill="currentColor" viewBox="0 0 24 24" style="display: none; width: 44px; height: 44px; margin: auto;">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+            </div>
+            <span style="font-size: 11px; color: var(--text-muted); margin-top: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Click photo to upload</span>
+            <input type="file" id="profileInput" accept="image/jpeg, image/png" style="display: none;" onchange="uploadProfilePicture(this)">
+        </div>
+
+        <div id="viewSection">
+            <label>Instructor Name</label>
+            <div class="info-field">{{ teacher_name }}</div>
+
+            <label>Department / Major</label>
+            <div class="info-field">{{ teacher_subject }}</div>
+        </div>
+
+        <form id="editSection" action="/update_profile={{ unique_id }}" method="POST" style="display: none;">
+            <label>Instructor Name</label>
+            <input type="text" name="name" class="info-field" value="{{ teacher_name }}" required>
+
+            <label>Department / Major</label>
+            <input type="text" name="major" class="info-field" value="{{ teacher_subject }}" placeholder="Enter department/major">
+
+            <button type="submit" class="action-btn" style="margin-bottom: 8px;">Save Changes</button>
+            <button type="button" class="cancel-btn" onclick="toggleEditMode()">Cancel</button>
+        </form>
+
+        <h3>Assigned Courses</h3>
+        <div class="classes-grid">
+            {{ course_badges }}
+        </div>
+        <a href="/timetable" class="action-btn">View Timetable</a>
+    </div>
+
+    <script>
+        function toggleEditMode() {
+            const viewSec = document.getElementById('viewSection');
+            const editSec = document.getElementById('editSection');
+            const toggleBtn = document.getElementById('editToggleBtn');
+
+            if (viewSec.style.display === 'none') {
+                viewSec.style.display = 'block';
+                editSec.style.display = 'none';
+                toggleBtn.style.display = 'block';
+            } else {
+                viewSec.style.display = 'none';
+                editSec.style.display = 'block';
+                toggleBtn.style.display = 'none';
+            }
+        }
+
+        function uploadProfilePicture(input) {
+            if (!input.files || !input.files[0]) return;
+            
+            const file = input.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const arrayBuffer = e.target.result;
+                
+                fetch('/upload_profile={{ unique_id }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/octet-stream' },
+                    body: arrayBuffer
+                })
+                .then(response => {
+                    if (response.ok) {
+                        const avatar = document.getElementById('avatarImage');
+                        avatar.src = "/project/profile/user_{{ unique_id }}.jpg?t=" + new Date().getTime();
+                        avatar.style.display = 'block';
+                        document.getElementById('defaultSvg').style.display = 'none';
+                        alert('Profile image updated successfully!');
+                    } else {
+                        alert('Upload failed.');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Error writing binary stream.');
+                });
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
+    </script>
+</body>
+</html>

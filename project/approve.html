@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Approved</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #e9ecef; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333333;
+        }
+
+        .success-card {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 420px;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            margin: 20px;
+        }
+
+        .icon-circle {
+            width: 70px;
+            height: 70px;
+            background-color: #d1fae5;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px auto;
+        }
+
+        .icon-circle svg {
+            width: 36px;
+            height: 36px;
+            color: #059669;
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        .details-box {
+            background-color: #f3f4f6;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .detail-label {
+            color: #6b7280;
+        }
+
+        .detail-value {
+            color: #1f2937;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="success-card">
+        
+        <div class="icon-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        </div>
+
+        <h2>Attendance Approved!</h2>
+        <p class="subtitle">Your attendance has been successfully recorded.</p>
+
+        <div class="details-box">
+            <div class="detail-row">
+                <span class="detail-label">Student Name</span>
+                <span class="detail-value">{{ student_name }}</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Student ID</span>
+                <span class="detail-value">{{ student_id }}</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Course/Subject</span>
+                <span class="detail-value">{{ subject }}</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Timestamp</span>
+                <span class="detail-value">{{ timestamp }}</span>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>NSPU Timetable</title>
+        <style>
+            :root {
+                --primary: #2563eb;
+                --bg-color: #f1f5f9;
+                --surface: #ffffff;
+                --text-main: #0f172a;
+                --text-muted: #64748b;
+                --border: #e2e8f0;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: "Inter", sans-serif;
+            }
+
+            body {
+                background-color: var(--bg-color);
+                padding: 20px;
+                color: var(--text-main);
+            }
+
+            .container {
+                max-width: 2000px;
+                margin: 0 auto;
+            }
+
+            .header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 25px;
+            }
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .back-btn {
+                text-decoration: none;
+                background: var(--surface);
+                padding: 10px 16px;
+                border-radius: 8px;
+                color: var(--text-main);
+                font-weight: 600;
+                border: 1px solid var(--border);
+            }
+
+            .table-card {
+                background: var(--surface);
+                border-radius: 1px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+                overflow: hidden;
+                border: 1px solid var(--border);
+            }
+
+            .table-responsive {
+                width: 100%;
+                overflow-x: auto;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            table {
+                width: 100%;
+                min-width: 900px;
+                border-collapse: collapse;
+                text-align: center;
+            }
+
+            th,
+            td {
+                padding: 12px 8px;
+                border: 1px solid black;
+            }
+
+            th {
+                background-color: #f8fafc;
+                color: black;
+                font-size: 1rem;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+
+            td {
+                font-size: 0.9rem;
+                font-weight: 500;
+            }
+
+            td:first-child {
+                background-color: #f8fafc;
+                font-weight: bolder;
+                text-align: left;
+                padding-left: 20px;
+                font-size: 1.2rem;
+                color: black;
+            }
+            th:first-child,td:first-child {
+                width: 170px;
+            }
+
+            .subject {
+                display: block;
+                padding: 8px 12px;
+                border-radius: 6px;
+                background: #eff6ff;
+                color: var(--primary);
+                font-weight: 600;
+                font-size: 1rem;
+            }
+
+            .no-lecture {
+                display: block;
+                padding: 8px 12px;
+                border-radius: 6px;
+                background: #474c53;
+                color: #ffffff;      
+                font-weight: bold;
+                font-size: 1rem;
+                border: 1px solid #e2e8f0; 
+            }
+
+            .subject.highlighted {
+                background-color: #f59e0b !important;
+                color: white !important;
+                font-weight: 700;
+                box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+            }
+            td.highlighted-cell {
+                background-color: #fef3c7 !important;
+                border: 2px solid #f59e0b !important;
+            }
+            .legend-card {
+                background: var(--surface);
+                border-radius: 1px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+                margin-top: 25px;
+                padding: 20px;
+                border: 1px solid black;
+            }
+
+            .legend-table {
+                width: 100%;
+                min-width: 100%;
+                border-collapse: collapse;
+                text-align: left;
+            }
+
+            .legend-table th, 
+            .legend-table td {
+                padding: 12px 16px;
+                border: 1px solid var(--border);
+                word-break: break-word;
+            }
+
+            .legend-table th {
+                background-color: #f8fafc;
+                color: black;
+                font-size: 1.1rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .legend-table td {
+                font-size: 0.95rem;
+            }
+
+            .legend-table tr:nth-child(even) {
+                background-color: #f8fafc;
+            }
+
+            .legend-table td:first-child {
+                font-weight: 600;
+                color: var(--primary);
+                width: 15%;
+                background-color: transparent;
+            }
+            .legend-schedule-wrapper {
+                display: flex;
+                flex-direction: row;
+                gap: 20px;
+                align-items: stretch;
+                margin-top: 25px;
+                width: 100%;
+            }
+
+            
+            .legend-card {
+                flex: 2;
+                background: var(--surface);
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+                padding: 16px;
+                border: 1px solid black;
+                overflow-x: auto;
+            }
+
+            .schedule-card {
+                flex: 1;
+                background: var(--surface);
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+                padding: 24px;
+                border: 1px solid var(--border);
+                border-top: 4px solid var(--primary);
+                min-width: 280px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .schedule-header {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .schedule-header h3 {
+                font-size: 1.15rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: var(--text-main);
+                margin: 0;
+            }
+
+            
+            .live-indicator {
+                width: 10px;
+                height: 10px;
+                background-color: #ef4444;
+                border-radius: 50%;
+                display: inline-block;
+                animation: pulse-red 2s infinite;
+            }
+
+            @keyframes pulse-red {
+                0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+                70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+                100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+            }
+
+            .schedule-label {
+                font-size: 0.75rem;
+                color: var(--text-muted);
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                display: block;
+                margin-bottom: 8px;
+            }
+
+            .subject-pill {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                background-color: #eff6ff;
+                color: var(--primary);
+                padding: 12px 16px;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 0.95rem;
+                border: 1px solid #bfdbfe;
+                transition: all 0.2s ease;
+            }
+
+            .subject-pill:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(37, 99, 235, 0.1);
+            }
+
+            .subject-pill.inactive {
+                background-color: #f8fafc;
+                color: #94a3b8;
+                border: 1px dashed #cbd5e1;
+                font-weight: 500;
+            }
+            .subject-pill.inactive:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .subject-pill.highlight-teacher {
+                background-color: #fffbeb !important; 
+                border: 1px solid #fcd34d !important; 
+                color: #b45309 !important;            
+            }
+
+            .teacher-badge {
+                background-color: #f59e0b;
+                color: #ffffff;
+                font-size: 0.65rem;
+                padding: 4px 8px;
+                border-radius: 12px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
+            }
+            th.split-cell {
+                position: relative;
+                min-width: 120px;
+                height: 65px;
+                padding: 0;
+                background-image: linear-gradient(
+                    to bottom left, 
+                    transparent calc(50% - 1.5px), 
+                    black calc(50% - 0.1px), 
+                    black calc(50% + 0.1px), 
+                    transparent calc(50% + 1.5px)
+                );
+            }
+
+            th.split-cell .time {
+                position: absolute;
+                top: 6px;
+                right: 23px;
+                text-transform: none;
+                font-weight: 700;
+                font-size: 1.4rem;
+                color: black;
+            }
+
+            th.split-cell .date {
+                position: absolute;
+                bottom: 6px;
+                left: 23px;
+                text-transform: none;
+                font-weight: 700;
+                font-size: 1.4rem;
+                color: black;
+            }
+            @media (max-width: 768px) {
+                .legend-schedule-wrapper {
+                    flex-direction: column;
+                }
+                .legend-table thead {
+                    display: none;
+                }
+                
+                .legend-table, 
+                .legend-table tbody, 
+                .legend-table tr, 
+                .legend-table td {
+                    display: block;
+                    width: 100% !important;
+                }
+
+                .legend-table tr {
+                    margin-bottom: 12px;
+                    border: 1px solid var(--border);
+                    padding: 12px;
+                    border-radius: 6px;
+                    background-color: var(--surface);
+                }
+
+                .legend-table tr:nth-child(even) {
+                    background-color: #f8fafc;
+                }
+
+                .legend-table td {
+                    padding: 4px 0;
+                    border: none;
+                }
+
+                .legend-table td:first-child {
+                    font-size: 1rem;
+                    font-weight: 700;
+                    color: var(--primary);
+                    margin-bottom: 2px;
+                }
+                
+                .legend-table td:last-child {
+                    color: var(--text-main);
+                }
+                th {
+                background-color: #f8fafc;
+                color: black;
+                font-size: 0.8rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                }
+
+                table td,
+                table td:first-child,
+                table td .subject,
+                table td .no-lecture {
+                    font-size: 0.7rem;
+                    font-weight: 500;
+                }
+                th.split-cell .time {
+                    position: absolute;
+                    top: 11px;
+                    right: 20px;
+                    text-transform: none;
+                    font-weight: 700;
+                    font-size: 0.8rem;
+                    color: black;
+                }
+
+                th.split-cell .date {
+                    position: absolute;
+                    bottom: 11px;
+                    left: 20px;
+                    text-transform: none;
+                    font-weight: 700;
+                    font-size: 0.8rem;
+                    color: black;
+                }
+                th:first-child,
+                td:first-child {
+                    width: 100px;
+                    min-width: 100px;
+                    max-width: 100px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>Weekly Timetable</h1>
+                <a href="homepage" class="back-btn">← Back</a>
+            </div>
+
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="split-cell">
+                                    <div class="time">Time</div>
+                                    <div class="date">Date</div>
+                                </th>
+                                <th>08:30 - 09:20</th>
+                                <th>09:20 - 10:10</th>
+                                <th>10:10 - 11:00</th>
+                                <th>11:00 - 11:50</th>
+                                <th>01:00 - 01:50</th>
+                                <th>01:50 - 02:40</th>
+                                <th>02:40 - 03:30</th>
+                                <th>03:30 - 04:20</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Monday</td>
+                                <td colspan="4"><span class="no-lecture">No Lecture</span></td>
+                                <td colspan="2"><span class="subject">PHYSICS(EPh-2001)</span></td>
+                                <td colspan="2"><span class="subject">Indystrial safety(ME-2002)</span></td>
+                            </tr>
+                            <tr>
+                                <td>Tuesday</td>
+                                <td colspan="2"><span class="subject">Industrial safety(ME-2002)</span></td>
+                                <td colspan="2"><span class="no-lecture">No Lecture</span></td>
+                                <td colspan="2"><span class="subject">C Programming(CEIT-2001)</span></td>
+                                <td><span class="subject">MYANMAR(M-2001)</span></td>
+                                <td><span class="no-lecture">No Lecture</span></td>
+                            </tr>
+                            <tr>
+                                <td>Wednesday</td>
+                                <td colspan="2"><span class="subject">PHYSICS(EPh-2001)</span></td>
+                                <td colspan="2"><span class="subject">MYANMAR(M-2001)</span></td>
+                                <td colspan="4"><span class="no-lecture">No Lecture</span></td>
+                            </tr>
+                            <tr>
+                                <td>Thursday</td>
+                                <td colspan="2"><span class="subject">MATH(EM-2011)</span></td>
+                                <td colspan="2"><span class="subject">PHYSICS(EPh-2001)</span></td>
+                                <td colspan="2"><span class="subject">C Programming(CEIT-2001)</span></td>
+                                <td colspan="2"><span class="subject">ENGLISH(E-2011)</span></td>
+                            </tr>
+                            <tr>
+                                <td>Friday</td>
+                                <td colspan="2"><span class="subject">ENGLISH(E-2011)</span></td>
+                                <td colspan="2"><span class="subject">PHYSICS(EPh-2001)</span></td>
+                                <td colspan="2"><span class="subject">MATH(EM-2011)</span></td>
+                                <td colspan="2"><span class="no-lecture">No Lecture</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>    
+        </div>
+        <div class="legend-schedule-wrapper">
+            <div class="legend-card">
+                <table class="legend-table">
+                    <thead>
+                        <tr>
+                            <th>Subject Code</th>
+                            <th>Subject Name</th>
+                            <th>Teacher</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>M-2001</td>
+                            <td>Myanmar II</td>
+                            <td>Daw Khin Chaw Su, Daw Lai Lai Nwe</td>
+                        </tr>
+                        <tr>
+                            <td>E-2011</td>
+                            <td>English Proficiency -II</td>
+                            <td>Daw Cherry Wynn, Daw Aye Thida Moe</td>
+                        </tr>
+                        <tr>
+                            <td>EM-2011</td>
+                            <td>Engineering Mathematics II (Calculus II and Vector Calculus)</td>
+                            <td>Dr. Marlar Tin, Daw Ei Ei Khin, Daw Kay Zin Oo</td>
+                        </tr>
+                        <tr>
+                            <td>EPh-2001</td>
+                            <td>Engineering Physics</td>
+                            <td>Dr. Myat Su Mon Win, Daw Zin Mar Oo, Daw Seint Seint Aye</td>
+                        </tr>
+                        <tr>
+                            <td>ME-2002</td>
+                            <td>Industrial Safety and Workshop Practices</td>
+                            <td>Daw Aye Myat Soe</td>
+                        </tr>
+                        <tr>
+                            <td>CEIT-2001</td>
+                            <td>C Programming</td>
+                            <td>Dr. Thu Thu Mon Oo</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="schedule-card">
+                <div class="schedule-header">
+                    <span class="live-indicator"></span>
+                    <h3>Live Schedule</h3>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <span class="schedule-label">Current Subject</span>
+                    <div>{{ current_subject_box | safe }}</div>
+                </div>
+
+                <div>
+                    <span class="schedule-label">Next 3 Subjects</span>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        {{ next_3_subjects_list | safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const teacherSubject = "{{ teacher_subject }}".toUpperCase().trim();
+                
+                if (teacherSubject && teacherSubject !== "" && !teacherSubject.includes("{")) {
+                    const subjectSpans = document.querySelectorAll('.subject');
+                    
+                    subjectSpans.forEach(span => {
+                        const spanText = span.innerText.trim().toUpperCase();
+                        
+                        if (spanText.includes(teacherSubject)) {
+                            span.classList.add('highlighted');
+                            const parentCell = span.closest('td');
+                            if (parentCell) {
+                                parentCell.classList.add('highlighted-cell');
+                            }
+                        }
+                    });
+                }
+            });
+        </script>
+    </body>
+</html>
